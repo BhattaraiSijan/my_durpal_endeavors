@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains mdx_editor.module.
- */
-
 use Drupal\Core\Routing\RouteMatchInterface;
 
 /**
