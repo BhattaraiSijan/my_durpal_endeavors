@@ -26,7 +26,7 @@ const datasetsForVedaProvider = {
               id: 'datetime',
               name: 'Date',
               type: 'datetime',
-              domain: [], // Default to empty array if not known
+              domain: [], 
               default: 'newest'
             }
           ],
@@ -64,14 +64,14 @@ const datasetsForVedaProvider = {
               id: 'datetime',
               name: 'Observation Date',
               type: 'datetime',
-              domain: ['2020-01-01T00:00:00Z', '2020-12-31T23:59:59Z'], // Example static domain
-              default: '2020-03-01T00:00:00Z' // Match initialDatetime or a valid date in domain
+              domain: ['2020-01-01T00:00:00Z', '2020-12-31T23:59:59Z'], 
+              default: '2020-03-01T00:00:00Z' 
             }
           ],
           sources: []
         },
         {
-          id: 'no2-monthly', // Layer used in InsertMapBlockButton snippet
+          id: 'no2-monthly', 
           stacCol: 'no2-monthly-diff',
           name: 'NO₂ Monthly Layer (Preview)',
           type: 'raster',

@@ -93,7 +93,6 @@ const MapBlockPreviewInEditor = ({ mdastNode }) => {
     mapBlockFinalProps.allowProjectionChange = String(allowProjectionChange).toLowerCase() === 'true';
   }
 
-  // Add datasets directly as a prop to MapBlock
   mapBlockFinalProps.datasets = datasetsForVedaProvider;
 
   console.log("MapBlockPreviewInEditor: Final props being passed to Veda MapBlock (with direct datasets prop):", JSON.stringify(mapBlockFinalProps, null, 2));
@@ -114,12 +113,11 @@ const MapBlockPreviewInEditor = ({ mdastNode }) => {
                 envMapboxToken: mapboxToken,
                 envApiStacEndpoint: apiStacEndpoint,
                 envApiRasterEndpoint: apiRasterEndpoint,
-                datasets: datasetsForVedaProvider, // Still provide to VedaUIProvider for other potential context consumers
+                datasets: datasetsForVedaProvider, 
                 navigation: { LinkComponent: 'a', linkProps: { pathAttributeKeyName: 'href' } },
                 theme: theme,
               }}
             >
-              {/* Pass datasetsForVedaProvider directly to MapBlock as well */}
               <MapBlock {...mapBlockFinalProps} />
             </VedaUIProvider>
           </DevseedUiThemeProvider>
