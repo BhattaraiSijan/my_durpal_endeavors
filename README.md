@@ -82,3 +82,5 @@
 
     **Screenshots**
     ![Mdx Editor within Drupal with Mapbox component](mdx_editor-drupal.png "Drupal MDX Editor Module")
+    ![Rendered Map](renderedmap.png "Rendered map")
+
