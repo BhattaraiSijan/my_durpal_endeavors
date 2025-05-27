@@ -11,7 +11,6 @@ import datasetsForVedaProvider from '../datasets.js';
 import { theme } from '../../../../veda/js/theme';   
 
 const queryClient = new QueryClient();
-
 const getAttributeValue = (mdastNode, attributeName, defaultValue = undefined) => {
   if (!mdastNode || !Array.isArray(mdastNode.attributes)) {
     return defaultValue;
