@@ -79,3 +79,6 @@
       </Prose>
     </Block>
     ```
+
+    **Screenshots**
+    ![Mdx Editor within Drupal with Mapbox component](mdx_editor-drupal.png "Drupal MDX Editor Module")
