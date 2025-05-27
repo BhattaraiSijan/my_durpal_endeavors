@@ -1,0 +1,17 @@
+# Node.js / Yarn / NPM
+node_modules/
+yarn-error.log
+npm-debug.log*
+package-lock.json
+yarn.lock 
+
+# Webpack build output directory
+js/dist/
+
+# Environment files - VERY IMPORTANT TO IGNORE
+.env
+.env.local
+.env.*.local
+# Except for .env.example or similar template files that contain no secrets
+!.env.example
+!.env.sample

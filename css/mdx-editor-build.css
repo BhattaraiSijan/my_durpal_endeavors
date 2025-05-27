@@ -1,0 +1,13 @@
+.mdx-editor-wrapper {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .mdx-editor-react-container {
+    margin-bottom: 15px;
+  }
+  
+  /* Override some Drupal admin styles that might conflict */
+  .mdx-editor-wrapper [role="toolbar"] button {
+    box-shadow: none;
+  }

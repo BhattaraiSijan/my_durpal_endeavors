@@ -1,0 +1,108 @@
+<?php
+
+/**
+ * @file
+ * Contains mdx_editor.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function mdx_editor_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    case 'help.page.mdx_editor':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The MDX Editor module integrates MDXEditor for Markdown editing capabilities with support for custom React components.') . '</p>';
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+function mdx_editor_field_widget_info_alter(array &$info) {
+  // Add MDX editor to text widgets
+  if (isset($info['text_textarea'])) {
+    $info['text_textarea']['class'] = 'Drupal\mdx_editor\Plugin\Field\FieldWidget\MDXEditorWidget';
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function mdx_editor_theme() {
+  return [
+    'mdx_editor' => [
+      'variables' => [
+        'element_id' => NULL,
+        'content' => NULL,
+      ],
+      'template' => 'mdx-editor',
+    ],
+    'mdx_rendered' => [
+      'variables' => [
+        'content' => NULL,
+        'format' => NULL,
+        'style' => 'default',
+      ],
+      'template' => 'mdx-rendered',
+    ],
+    'mdx_remote' => [
+      'variables' => [
+        'content' => NULL,
+        'format' => NULL,
+        'style' => 'default',
+        'enable_components' => TRUE,
+      ],
+      'template' => 'mdx-remote',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function mdx_editor_field_formatter_info_alter(array &$info) {
+  // Add our custom formatters
+  if (isset($info['text_default'])) {
+    $info['mdx_rendered'] = [
+      'id' => 'mdx_rendered',
+      'label' => t('MDX Rendered'),
+      'description' => t('Display content as rendered MDX'),
+      'field_types' => ['text', 'text_long', 'text_with_summary'],
+      'provider' => 'mdx_editor',
+      'class' => 'Drupal\mdx_editor\Plugin\Field\FieldFormatter\MDXRenderedFormatter',
+    ];
+    
+    $info['mdx_remote'] = [
+      'id' => 'mdx_remote',
+      'label' => t('MDX Remote Renderer'),
+      'description' => t('Display MDX with custom React components'),
+      'field_types' => ['text', 'text_long', 'text_with_summary'],
+      'provider' => 'mdx_editor',
+      'class' => 'Drupal\mdx_editor\Plugin\Field\FieldFormatter\MDXRemoteFormatter',
+    ];
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function mdx_editor_page_attachments(array &$attachments) {
+  // Attach any global CSS/JS needed for MDX components on all pages
+  // This is useful for ensuring styles are available before the components load
+  $attachments['#attached']['library'][] = 'mdx_editor/mdx-global';
+}
+
+/**
+ * Implements hook_library_info_alter().
+ */
+function mdx_editor_library_info_alter(&$libraries, $extension) {
+  // Make any dynamic adjustments to libraries if needed
+  if ($extension === 'mdx_editor' && isset($libraries['mdx-remote'])) {
+    // You could dynamically add dependencies based on configuration
+  }
+}

@@ -1,0 +1,101 @@
+/* Styles for the MDX renderer */
+.mdx-renderer-wrapper {
+    font-family: var(--font-sans, system-ui, -apple-system, sans-serif);
+    line-height: 1.6;
+    padding: 1rem;
+  }
+  
+  /* Hide the toolbar in read-only mode */
+  .mdx-renderer-wrapper [role="toolbar"] {
+    display: none !important;
+  }
+  
+  /* Make the editor look like static content */
+  .mdx-renderer-wrapper .mdxeditor {
+    border: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  
+  .mdx-style-default {
+    /* Default styling */
+  }
+  
+  .mdx-style-minimal {
+    font-size: 0.95rem;
+  }
+  
+  .mdx-style-rich {
+    font-size: 1.05rem;
+    --heading-color: #2c5282;
+    --link-color: #3182ce;
+  }
+  
+  .mdx-style-rich h1,
+  .mdx-style-rich h2,
+  .mdx-style-rich h3,
+  .mdx-style-rich h4,
+  .mdx-style-rich h5,
+  .mdx-style-rich h6 {
+    color: var(--heading-color);
+  }
+  
+  .mdx-style-rich a {
+    color: var(--link-color);
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+  }
+  
+  .mdx-style-rich blockquote {
+    border-left: 4px solid #e2e8f0;
+    padding-left: 1rem;
+    font-style: italic;
+  }
+  
+  .mdx-style-rich code {
+    background-color: #f7fafc;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-family: var(--font-mono, monospace);
+  }
+  
+  .mdx-style-rich pre {
+    background-color: #1a202c;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: 6px;
+    overflow-x: auto;
+  }
+  
+  .mdx-style-rich pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+  }
+  
+  /* Error handling styles */
+  .mdx-renderer-error {
+    padding: 1rem;
+    border: 1px solid #f56565;
+    background-color: #fff5f5;
+    border-radius: 0.25rem;
+  }
+  
+  .mdx-renderer-error p {
+    color: #c53030;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+  }
+  
+  .mdx-renderer-error pre {
+    white-space: pre-wrap;
+    font-family: monospace;
+    font-size: 0.875rem;
+    color: #4a5568;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+
+
+  

@@ -1,0 +1,7 @@
+name: MDX Editor
+description: Integrates MDXEditor for Markdown editing capabilities
+type: module
+core_version_requirement: ^10 || ^11
+package: Custom
+dependencies:
+  - drupal:field
