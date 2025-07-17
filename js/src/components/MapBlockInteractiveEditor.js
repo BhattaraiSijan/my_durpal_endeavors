@@ -9,7 +9,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
 import datasetsForVedaProvider from '../datasets.js';
-import { theme } from '../../../../veda/js/theme';
+import { theme } from '../../../../veda/js/theme.js';
 
 const queryClient = new QueryClient();
 
