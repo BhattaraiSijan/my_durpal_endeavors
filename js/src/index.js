@@ -1,7 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import MDXEditorComponent from './MDXEditorComponent';
-// import EditorPage from './EnhancedMdxEditor.tsx';
+import EditorPage from './EnhancedMdxEditor.tsx';
 import './styles.css';
 
 (function ($, Drupal, once) {
@@ -22,7 +22,7 @@ import './styles.css';
         try {
           const root = createRoot(container);
           root.render(
-            <MDXEditorComponent 
+            <EditorPage 
               textarea={element}
               initialContent={initialContent}
             />

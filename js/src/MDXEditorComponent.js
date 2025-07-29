@@ -29,6 +29,7 @@ import '@mdxeditor/editor/style.css';
 import InsertMapBlockButton from './components/InsertMapBlockButton';
 import MapBlockPreviewInEditor from './components/MapBlockPreviewEditor';
 import MapBlockInteractiveEditor from './components/MapBlockInteractiveEditor';
+import MapEditor from './MapEditor';
 
 const vedaComponentDescriptors = [
   {
