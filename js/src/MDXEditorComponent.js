@@ -27,10 +27,8 @@ import {
 import '@mdxeditor/editor/style.css';
 
 import InsertMapBlockButton from './components/InsertMapBlockButton';
-import InsertEmitInterfaceButton from './components/InsertEmitInterfaceButton';
-import MapBlockInteractiveEditor from './components/MapBlockInteractiveEditor';
-import EmitInterfacePreviewEditor from './components/EmitInterfacePreviewEditor';
 import MapBlockPreviewInEditor from './components/MapBlockPreviewEditor';
+import MapBlockInteractiveEditor from './components/MapBlockInteractiveEditor';
 
 const vedaComponentDescriptors = [
   {
@@ -46,32 +44,6 @@ const vedaComponentDescriptors = [
     hasChildren: false,
     Editor: MapBlockInteractiveEditor,
   },
-   {
-    name: 'CloudBrowse',
-    kind: 'flow',
-    // Define the props the editor should look for
-    props: [
-      { name: 'config', type: 'object' } // This can be a complex object, so we use 'object'
-      // You can add other config props here if you want them to be editable
-    ],
-    hasChildren: false,
-    Editor: EmitInterfacePreviewEditor,
-    
-  //  {
-  //   name: 'EmitInterface',
-  //   kind: 'flow',
-  //   // Define the props the editor should look for
-  //   props: [
-  //     { name: 'collectionId', type: 'string' },
-  //     { name: 'zoomLocation', type: 'expression' }, // 'expression' is used for objects, arrays, etc.
-  //     { name: 'zoomLevel', type: 'number' },
-  //     { name: 'config', type: 'object' }, // This can be a complex object, so we use 'object'
-  //     // You can add other config props here if you want them to be editable
-  //   ],
-  //   hasChildren: false,
-  //   Editor: EmitInterfacePreviewEditor,
-  },
-
   { name: 'Block', kind: 'flow', props: [{ name: 'type', type: 'string' }], hasChildren: true, Editor: GenericJsxEditor },
   { name: 'Figure', kind: 'flow', props: [], hasChildren: true, Editor: GenericJsxEditor },
   { name: 'Widget', kind: 'flow', props: [{ name: 'heading', type: 'string' }], hasChildren: true, Editor: GenericJsxEditor },
@@ -107,6 +79,7 @@ const MDXEditorComponent = ({ textarea, initialContent }) => {
 
   const handleChange = (content) => {
     const stringContent = content && typeof content === 'string' ? content : '';
+    console.log('MDX content changed:', stringContent);
     setMarkdown(stringContent);
   };
 
@@ -139,7 +112,6 @@ const MDXEditorComponent = ({ textarea, initialContent }) => {
                 <CodeToggle />
                 <InsertThematicBreak />
                 <InsertMapBlockButton editorRef={editorRef} />
-                <InsertEmitInterfaceButton editorRef={editorRef} />
               </Fragment>
             ),
           }),

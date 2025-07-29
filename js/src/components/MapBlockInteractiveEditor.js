@@ -9,7 +9,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { useMdastNodeUpdater } from '@mdxeditor/editor';
 
 import datasetsForVedaProvider from '../datasets.js';
-import { theme } from '../../../../veda/js/theme.js';
+import { theme } from '../theme.js';
 
 const queryClient = new QueryClient();
 
@@ -125,10 +125,6 @@ const MapBlockInteractiveEditor = ({ mdastNode }) => {
   }, []);
 
   const handleCommitChanges = useCallback(() => {
-    if (typeof updateMdastNode !== 'function') {
-      console.error("MapBlockInteractiveEditor: updateMdastNode (from hook) is not a function!");
-      return;
-    }
     const newAttributes = [];
     if (formState.datasetId) newAttributes.push(createAttributeAstNode('datasetId', formState.datasetId));
     if (formState.layerId) newAttributes.push(createAttributeAstNode('layerId', formState.layerId));
@@ -164,7 +160,6 @@ const MapBlockInteractiveEditor = ({ mdastNode }) => {
         <div style={{ minHeight: '350px', position: 'relative', border: '1px solid lightgrey' }}>
           {isPreviewValid && previewProps.datasetId && previewProps.layerId ? (
             <QueryClientProvider client={queryClient}>
-              <BrowserRouter>
                 <DevseedUiThemeProvider theme={theme}>
                   <VedaUIProvider
                     config={{
@@ -179,7 +174,6 @@ const MapBlockInteractiveEditor = ({ mdastNode }) => {
                     {(previewProps.datasetId && previewProps.layerId) && <MapBlock {...previewProps} />}
                   </VedaUIProvider>
                 </DevseedUiThemeProvider>
-              </BrowserRouter>
             </QueryClientProvider>
           ) : (
             <p style={{textAlign: 'center', color: 'grey', padding: '20px'}}>

@@ -1,129 +1,126 @@
 import React from 'react';
-import {
-  VedaUIProvider,
-  DevseedUiThemeProvider,
-  MapBlock,
-} from '@teamimpact/veda-ui';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter } from 'react-router-dom';
 
-import datasetsForVedaProvider from '../datasets.js'; 
-import { theme } from '../../../../veda/js/theme';   
-
-const queryClient = new QueryClient();
 const getAttributeValue = (mdastNode, attributeName, defaultValue = undefined) => {
-  if (!mdastNode || !Array.isArray(mdastNode.attributes)) {
-    return defaultValue;
-  }
+  if (!mdastNode?.attributes) return defaultValue;
+  
   const attr = mdastNode.attributes.find(a => a.name === attributeName);
-
-  if (!attr) {
-    return defaultValue;
-  }
-
-  if (attr.value && typeof attr.value === 'object' && attr.value.type === 'mdxJsxAttributeValueExpression') {
+  if (!attr) return defaultValue;
+  
+  // Handle JSX expression attributes
+  if (attr.value?.type === 'mdxJsxAttributeValueExpression') {
     try {
-      const estree = attr.value.data?.estree;
-      if (estree && estree.body && estree.body.length > 0 && estree.body[0].type === 'ExpressionStatement') {
-        const expression = estree.body[0].expression;
-        if (expression.type === 'Literal') {
-          return expression.value; 
-        } else if (expression.type === 'ArrayExpression' || expression.type === 'ObjectExpression') {
-          const stringifiedValue = attr.value.value; 
-          if (typeof stringifiedValue === 'string') {
-            try {
-              const jsonFriendlyString = stringifiedValue.replace(/'/g, '"');
-              return JSON.parse(jsonFriendlyString);
-            } catch (jsonError) {
-              return stringifiedValue; 
-            }
-          }
+      const value = attr.value.value;
+      if (typeof value === 'string') {
+        // Try to parse arrays/objects
+        if (value.startsWith('[') || value.startsWith('{')) {
+          return JSON.parse(value.replace(/'/g, '"'));
         }
       }
-    } catch (e) { /* Fall through */ }
-    return attr.value.value; 
+      return value;
+    } catch {
+      return attr.value.value;
+    }
   }
   
-  let value = attr.value;
+  // Handle boolean strings
+  const value = attr.value;
   if (typeof value === 'string') {
-    const lcValue = value.toLowerCase().trim();
-    if (lcValue === 'true') return true;
-    if (lcValue === 'false') return false;
+    const lower = value.toLowerCase().trim();
+    if (lower === 'true') return true;
+    if (lower === 'false') return false;
   }
   
-  return value; 
+  return value;
 };
 
-
 const MapBlockPreviewInEditor = ({ mdastNode }) => {
-  const datasetId = getAttributeValue(mdastNode, 'datasetId');
-  const layerId = getAttributeValue(mdastNode, 'layerId');
-  const dateTime = getAttributeValue(mdastNode, 'dateTime');
-  const compareDateTime = getAttributeValue(mdastNode, 'compareDateTime');
-  const compareLabel = getAttributeValue(mdastNode, 'compareLabel', '');
-  const projectionId = getAttributeValue(mdastNode, 'projectionId', 'equirectangular');
-  const projectionCenter = getAttributeValue(mdastNode, 'projectionCenter'); 
-  const projectionParallels = getAttributeValue(mdastNode, 'projectionParallels'); 
-  const allowProjectionChange = getAttributeValue(mdastNode, 'allowProjectionChange', true); 
+  // Extract all props
+  const props = {
+    datasetId: getAttributeValue(mdastNode, 'datasetId'),
+    layerId: getAttributeValue(mdastNode, 'layerId'),
+    dateTime: getAttributeValue(mdastNode, 'dateTime'),
+    compareDateTime: getAttributeValue(mdastNode, 'compareDateTime'),
+    compareLabel: getAttributeValue(mdastNode, 'compareLabel', ''),
+    projectionId: getAttributeValue(mdastNode, 'projectionId', 'equirectangular'),
+    projectionCenter: getAttributeValue(mdastNode, 'projectionCenter'),
+    projectionParallels: getAttributeValue(mdastNode, 'projectionParallels'),
+    allowProjectionChange: getAttributeValue(mdastNode, 'allowProjectionChange', true)
+  };
 
-  if (!datasetId || !layerId) {
+  // Validation
+  if (!props.datasetId || !props.layerId) {
     return (
-      <div style={{ padding: '10px', border: '1px dashed orangered', color: 'orangered', backgroundColor: '#fff5e6' }}>
-        MapBlock Preview Error: Missing `datasetId` or `layerId`.
-        <pre>{JSON.stringify(mdastNode?.attributes, null, 2)}</pre>
+      <div style={{ 
+        padding: '20px', 
+        border: '2px dashed #e74c3c', 
+        borderRadius: '8px',
+        backgroundColor: '#fee',
+        margin: '10px 0'
+      }}>
+        <strong>⚠️ MapBlock Error:</strong> Missing required props
+        <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
+          Required: datasetId="{props.datasetId || '???'}" layerId="{props.layerId || '???'}"
+        </div>
       </div>
     );
   }
 
-  const mapboxToken = process.env.MDX_EDITOR_MAPBOX_TOKEN || "YOUR_FALLBACK_MAPBOX_TOKEN_HERE";
-  const apiStacEndpoint = process.env.MDX_EDITOR_API_STAC_ENDPOINT || "https://openveda.cloud/api/stac";
-  const apiRasterEndpoint = process.env.MDX_EDITOR_API_RASTER_ENDPOINT || "https://openveda.cloud/api/raster";
-
-  const mapBlockFinalProps = { datasetId, layerId };
-  if (dateTime !== undefined) mapBlockFinalProps.dateTime = dateTime;
-  if (compareDateTime !== undefined) mapBlockFinalProps.compareDateTime = compareDateTime;
-  if (compareLabel !== undefined && compareLabel !== '') mapBlockFinalProps.compareLabel = compareLabel;
-  if (projectionId !== undefined) mapBlockFinalProps.projectionId = projectionId;
-  if (projectionCenter !== undefined) mapBlockFinalProps.projectionCenter = projectionCenter;
-  if (projectionParallels !== undefined) mapBlockFinalProps.projectionParallels = projectionParallels;
-  if (typeof allowProjectionChange === 'boolean') {
-    mapBlockFinalProps.allowProjectionChange = allowProjectionChange;
-  } else if (allowProjectionChange !== undefined) { 
-    mapBlockFinalProps.allowProjectionChange = String(allowProjectionChange).toLowerCase() === 'true';
-  }
-
-  mapBlockFinalProps.datasets = datasetsForVedaProvider;
-
-  console.log("MapBlockPreviewInEditor: Final props being passed to Veda MapBlock (with direct datasets prop):", JSON.stringify(mapBlockFinalProps, null, 2));
-
+  // Static preview - NO ACTUAL MAP RENDERING
   return (
     <div style={{
-      border: '1px solid #4A90E2', padding: '10px', margin: '5px',
-      backgroundColor: '#E9F5FF', minHeight: '400px', position: 'relative', overflow: 'hidden'
+      border: '2px solid #3498db',
+      borderRadius: '8px',
+      padding: '20px',
+      margin: '10px 0',
+      backgroundColor: '#f0f8ff',
+      position: 'relative',
+      minHeight: '200px',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
     }}>
-      <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', fontSize: '0.9em', color: '#2C3E50', textAlign: 'center' }}>
-        Map Preview (Dataset: {datasetId}, Layer: {layerId})
-      </p>
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <DevseedUiThemeProvider theme={theme}>
-            <VedaUIProvider
-              config={{
-                envMapboxToken: mapboxToken,
-                envApiStacEndpoint: apiStacEndpoint,
-                envApiRasterEndpoint: apiRasterEndpoint,
-                datasets: datasetsForVedaProvider, 
-                navigation: { LinkComponent: 'a', linkProps: { pathAttributeKeyName: 'href' } },
-                theme: theme,
-              }}
-            >
-              <MapBlock {...mapBlockFinalProps} />
-            </VedaUIProvider>
-          </DevseedUiThemeProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-      <div style={{fontSize: '0.8em', marginTop: '10px', color: '#777', textAlign: 'center', borderTop: '1px solid #ddd', paddingTop: '5px'}}>
-        (Live preview.)
+      {/* Map icon placeholder */}
+      <div style={{
+        fontSize: '48px',
+        marginBottom: '15px',
+        opacity: 0.6
+      }}>
+        🗺️
+      </div>
+      
+      {/* Component info */}
+      <div style={{
+        textAlign: 'center',
+        color: '#2c3e50'
+      }}>
+        <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>MapBlock Component</h3>
+        
+        <div style={{
+          fontSize: '14px',
+          lineHeight: '1.6',
+          color: '#555'
+        }}>
+          <div><strong>Dataset:</strong> {props.datasetId}</div>
+          <div><strong>Layer:</strong> {props.layerId}</div>
+          {props.dateTime && <div><strong>Date:</strong> {props.dateTime}</div>}
+          {props.compareDateTime && <div><strong>Compare Date:</strong> {props.compareDateTime}</div>}
+          {props.projectionId !== 'equirectangular' && 
+            <div><strong>Projection:</strong> {props.projectionId}</div>
+          }
+        </div>
+      </div>
+      
+      {/* Preview note */}
+      <div style={{
+        position: 'absolute',
+        bottom: '10px',
+        right: '10px',
+        fontSize: '12px',
+        color: '#999',
+        fontStyle: 'italic'
+      }}>
+        Editor Preview
       </div>
     </div>
   );

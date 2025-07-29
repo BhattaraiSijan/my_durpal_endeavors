@@ -6,7 +6,7 @@ mdx-editor:
   css:
     component:
       node_modules/@mdxeditor/editor/dist/style.css: {}
-      css/mdx-editor.css: {}
+      js/css/mdx-editor-build.css: {}
   dependencies:
     - core/drupal
     - core/jquery
@@ -20,8 +20,8 @@ mdx-renderer:
   css:
     component:
       node_modules/@mdxeditor/editor/dist/style.css: {}
-      css/mdx-renderer.css: {}
-      css/mdx-isolated-syntax.css: { weight: 100 }
+      js/css/mdx-renderer-build.css: {}
+      # css/mdx-isolated-syntax.css: { weight: 100 }
   dependencies:
     - core/drupal
     - core/jquery
@@ -35,9 +35,9 @@ mdx-remote:
     js/src/syntax-initializer.js: {minified: true}
   css:
     component:
-      css/mdx-renderer.css: {}
-      css/mdx-components.css: {}
-      css/mdx-isolated-syntax.css: { weight: 100 }
+      js/css/mdx-renderer-build.css: {}
+      # js/css/mdx-components.css: {}
+      # css/mdx-isolated-syntax.css: { weight: 100 }
   dependencies:
     - core/drupal
     - core/jquery

@@ -11,6 +11,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'js/dist'),
+    publicPath: '/modules/mdx_editor/js/dist/'
   },
   plugins: [
     new MiniCssExtractPlugin({
@@ -27,12 +28,12 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.(js|jsx)$/,
+        test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react']
+            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
           }
         }
       },
@@ -46,21 +47,9 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.ts', '.tsx'],
     fallback: {
       "stream": require.resolve("stream-browserify")
-    },
-    // FIX v2: Add a specific alias for the problematic import path.
-    // This is a more direct way to tell webpack where to find this module,
-    // which can be more effective than the byDependency rule.
-    alias: {
-      '@mui/material/styles': path.resolve(__dirname, 'node_modules/@mui/material/styles'),
-    },
-    // The original fix is kept as a fallback for other potential ESM issues.
-    byDependency: {
-      esm: {
-        fullySpecified: false,
-      },
-    },
+    }
   },
 };

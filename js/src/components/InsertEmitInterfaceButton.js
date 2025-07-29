@@ -6,7 +6,7 @@ import React from 'react';
  * a live preview for it using the EmitInterfacePreviewEditor component.
  * Note that array values like zoomLocation must be wrapped in curly braces {}.
  */
-const EmitInterfaceMdx = `<CloudBrowse 
+const EmitInterfaceMdx = `<EmitInterface 
  
 />`;
 

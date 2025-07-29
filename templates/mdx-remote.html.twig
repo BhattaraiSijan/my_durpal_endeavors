@@ -1,37 +1,22 @@
 {#
 /**
- * @file
- * Theme implementation for the MDX Remote Renderer container.
- *
- * This template renders a placeholder div that will be targeted by JavaScript
- * to initialize the React MDX renderer. The actual MDX content and settings
- * are passed via drupalSettings in the corresponding FieldFormatter.
- *
- * Available variables:
- * - unique_id: A unique HTML ID for this specific MDX block instance.
- * - style: The rendering style setting (e.g., 'default', 'minimal', 'rich').
- * - enable_components: Boolean indicating if custom components are allowed.
- * - format: The text format associated with the field.
- * - attributes: HTML attributes for the container element. (Drupal default)
- *
- * Note: The 'content' variable is intentionally NOT used directly here,
- * as it's passed via drupalSettings to avoid issues with complex content
- * in HTML attributes.
- */
+ * @file
+ * Theme implementation for the MDX Remote Renderer container.
+ *
+ * This template renders a placeholder div that will be targeted by JavaScript
+ * to initialize the React MDX renderer.
+ *
+ * The MDX content and settings are passed automatically via the #attached
+ * property in the corresponding FieldFormatter (MDXRemoteFormatter.php),
+  * so no <script> tag is needed here.
+ *
+ * Available variables:
+ * - unique_id: A unique HTML ID for this specific MDX block instance.
+ * - style: The rendering style setting.
+ * - attributes: HTML attributes for the container element.
+ */
 #}
-{# Add classes for styling and identification. Use the unique ID. #}
-<div {{ attributes.addClass('mdx-remote-container', 'mdx-style-' ~ style|escape('html_attr')) }} data-sth="{{unique_id}}" id="{{ unique_id|escape('html_attr') }}">
-  {# Provide a simple loading message or element for feedback before JS runs. #}
-  {# This content will be replaced by React. #}
+<div {{ attributes.addClass('mdx-remote-container', 'mdx-style-' ~ style) }} id="{{ unique_id }}">
+  {# This content will be replaced by the React component once it loads. #}
   <p class="mdx-loading-placeholder">{{ 'Loading MDX content...'|t }}</p>
-
-  {# Optional: Include noscript fallback if desired, though displaying raw MDX might not be ideal. #}
-  {#
-  <noscript>
-    <div class="mdx-noscript-fallback">
-      <p>{{ 'JavaScript is required to properly view this MDX content.'|t }}</p>
-      {# Consider rendering a simplified version or just a message #}
-    </div>
-  </noscript>
-  #}
 </div>

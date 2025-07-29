@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import MDXEditorComponent from './MDXEditorComponent';
+// import EditorPage from './EnhancedMdxEditor.tsx';
 import './styles.css';
 
 (function ($, Drupal, once) {
