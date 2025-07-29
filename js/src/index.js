@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import MDXEditorComponent from './MDXEditorComponent';
 import EditorPage from './EnhancedMdxEditor.tsx';
+import { allAvailableDatasets } from './content/datasets/alldatasets';
 import './styles.css';
 
 (function ($, Drupal, once) {
@@ -23,6 +24,7 @@ import './styles.css';
           const root = createRoot(container);
           root.render(
             <EditorPage 
+              allAvailableDatasets={allAvailableDatasets}
               textarea={element}
               initialContent={initialContent}
             />

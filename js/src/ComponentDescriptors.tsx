@@ -73,7 +73,7 @@ export const jsxComponentDescriptors: JsxComponentDescriptor[] = [
   {
     name: 'Map',
     kind: 'text',
-    source: '@teamimpact/veda-ui',
+    source: '',
     props: [
       { name: 'center', type: 'string' },
       { name: 'zoom', type: 'string' },
@@ -98,7 +98,7 @@ export const jsxComponentDescriptors: JsxComponentDescriptor[] = [
   {
     name: 'Chart',
     kind: 'text',
-    source: '@teamimpact/veda-ui',
+    source: '',
     props: [
       { name: 'dataPath', type: 'string' },
       { name: 'dateFormat', type: 'string' },

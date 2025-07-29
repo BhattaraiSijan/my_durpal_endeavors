@@ -101,7 +101,8 @@ export function MDXEditorEnhanced({
   const editorRef = useRef(null);
   const [mdast, setMdast] = useState(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
-
+  const [currentMarkdown, setCurrentMarkdown] = useState(markdown);
+  
   // Check if editor is ready after mount
   useEffect(() => {
     const checkEditor = () => {
@@ -112,14 +113,35 @@ export function MDXEditorEnhanced({
         setTimeout(checkEditor, 100);
       }
     };
-
+    
     checkEditor();
   }, []);
-
+  
+  useEffect(() => {
+    // Get textarea from props or context
+    const textarea = document.querySelector('.mdx-editor-field');
+    if (textarea && markdown) {
+      textarea.value = markdown;
+      textarea.setAttribute('data-mdx-updated', 'true');
+      const event = new Event('input', { bubbles: true });
+      textarea.dispatchEvent(event);
+    }
+  }, [markdown]);
+  
+  useEffect(() => {
+    const textarea = document.querySelector('.mdx-editor-field');
+    if (textarea && currentMarkdown) {
+      textarea.value = currentMarkdown;
+      textarea.setAttribute('data-mdx-updated', 'true');
+      const event = new Event('input', { bubbles: true });
+      textarea.dispatchEvent(event);
+    }
+  }, [currentMarkdown]);
+  
   const analyzeMdast = () => {
     try {
       const markdown = editorRef.current && editorRef.current.getMarkdown();
-
+      
       if (markdown) {
         const tree = fromMarkdown(markdown, {
           extensions: [mdxJsx()],
@@ -145,7 +167,7 @@ export function MDXEditorEnhanced({
           }
         });
         setMdast(tree);
-
+        
         previewMDAST(reserializedMdxContent(tree));
       }
     } catch (error) {
@@ -153,60 +175,72 @@ export function MDXEditorEnhanced({
       alert('Error analyzing MDAST: ' + error.message);
     }
   };
-
+  
   return (
     <div className='h-[600px] border rounded-lg overflow-hidden'>
-      <MDXEditor
-        ref={editorRef}
-        markdown={markdown}
-        onChange={(e) => {
-          analyzeMdast();
-          return onChange(e);
-        }}
-        contentEditableClassName='prose prose-lg max-w-none min-h-[500px] outline-none px-4 py-2'
-        plugins={[
-          scrollytellingButtonPlugin(),
-          headingsPlugin(),
-          listsPlugin(),
-          quotePlugin(),
-          thematicBreakPlugin(),
-          markdownShortcutPlugin(),
-          codeBlockPlugin(),
-          frontmatterPlugin(),
-          imagePlugin(),
-          linkPlugin(),
-          linkDialogPlugin(),
-          jsxPlugin({
-            jsxComponentDescriptors,
-          }),
-          markdownShortcutPlugin(),
-          directivesPlugin({
-            directiveDescriptors: [CalloutDirectiveDescriptor],
-          }),
-          toolbarPlugin({
-            toolbarContents: () => (
-              <div className='grid-column'>
-                <div className='grid-row border-bottom-1px padding-y-1'>
-                  <UndoRedo />
-                  <BoldItalicUnderlineToggles />
-                  <ListsToggle />
-                  <BlockTypeSelect />
-                  <CreateLink />
-                  <CodeToggle />
-                  <InsertImage />
-                </div>
-                <div className='grid-row padding-y-1'>
-                  <InsertMapButton />
-                  <InsertLineGraph />
-                  <InsertTwoColumnButton />
-                  <InsertSectionBreak />
-                </div>
-              </div>
-            ),
-          }),
-        ]}
-        className='w-full h-full'
-      />
+    <MDXEditor
+    ref={editorRef}
+    markdown={markdown}
+    onChange={(content) => {
+      setCurrentMarkdown(content);
+      
+      
+      // Sync with textarea immediately
+      const textarea = document.querySelector('.mdx-editor-field');
+      if (textarea) {
+        textarea.value = content;
+        textarea.setAttribute('data-mdx-updated', 'true');
+        const event = new Event('input', { bubbles: true });
+        textarea.dispatchEvent(event);
+      }
+      
+      analyzeMdast();
+      return onChange(content);
+    }}
+    contentEditableClassName='prose prose-lg max-w-none min-h-[500px] outline-none px-4 py-2'
+    plugins={[
+      scrollytellingButtonPlugin(),
+      headingsPlugin(),
+      listsPlugin(),
+      quotePlugin(),
+      thematicBreakPlugin(),
+      markdownShortcutPlugin(),
+      codeBlockPlugin(),
+      frontmatterPlugin(),
+      imagePlugin(),
+      linkPlugin(),
+      linkDialogPlugin(),
+      jsxPlugin({
+        jsxComponentDescriptors,
+      }),
+      markdownShortcutPlugin(),
+      directivesPlugin({
+        directiveDescriptors: [CalloutDirectiveDescriptor],
+      }),
+      toolbarPlugin({
+        toolbarContents: () => (
+          <div className='grid-column'>
+          <div className='grid-row border-bottom-1px padding-y-1'>
+          <UndoRedo />
+          <BoldItalicUnderlineToggles />
+          <ListsToggle />
+          <BlockTypeSelect />
+          <CreateLink />
+          <CodeToggle />
+          <InsertImage />
+          </div>
+          <div className='grid-row padding-y-1'>
+          <InsertMapButton />
+          <InsertLineGraph />
+          <InsertTwoColumnButton />
+          <InsertSectionBreak />
+          </div>
+          </div>
+        ),
+      }),
+    ]}
+    className='w-full h-full'
+    />
     </div>
   );
 }

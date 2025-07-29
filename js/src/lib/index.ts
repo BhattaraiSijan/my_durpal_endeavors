@@ -34,6 +34,7 @@ import {
   StoryData,
   VedaData,
   LegacyGlobalStyles,
+  Map,
 } from '@teamimpact/veda-ui';
 
 /**

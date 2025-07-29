@@ -24,7 +24,7 @@ interface MapPreviewProps {
 }
 
 export function ClientMapBlock(props: MapPreviewProps) {
-const datasetsToUse = props.allAvailableDatasets || [];
+const datasetsToUse = props.datasets || [];
 if (datasetsToUse.length === 0) {
     return (
       <div className='relative w-full h-[250px] flex items-center justify-center bg-gray-100'>
@@ -34,12 +34,15 @@ if (datasetsToUse.length === 0) {
   }
 
 const transformed = transformToVedaData(datasetsToUse as any);
+
+console.log('Transformed datasets:', transformed);
+console.log('Props for MapBlock:', props);
   return (
     <DevseedUIThemeProvider>
       <VedaUIConfigProvider>
         <DataProvider initialDatasets={datasetsToUse}>
           <div className='relative w-full h-[250px]'>
-            <MapBlock {...props} datasets={transformed} />
+            <MapBlock {...props} datasets={transformed}/>
           </div>
         </DataProvider>
       </VedaUIConfigProvider>

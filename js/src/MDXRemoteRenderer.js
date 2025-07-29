@@ -15,19 +15,36 @@ import {
   Widget,
   MapBlock,
   Caption,
-  Prose
+  Prose,
 } from '@teamimpact/veda-ui';
+
+import { ClientMapBlock } from './MapPreview';
 
 import { theme } from '../../../veda/js/theme';
 import './renderer-styles.css';
 
 const queryClient = new QueryClient();
-import mockDatasets from './datasets';
+import { allAvailableDatasets } from './content/datasets/alldatasets';
+
+// Transform datasets from your format to VedaUI format
+const transformedDatasets = allAvailableDatasets.map(dataset => ({
+  id: dataset.metadata.id,
+  data: {
+    id: dataset.metadata.id,
+    name: dataset.metadata.name,
+    description: dataset.metadata.description,
+    usage: [],
+    media: {},
+    taxonomy: dataset.metadata.taxonomy || [],
+    infoDescription: dataset.metadata.description,
+    layers: dataset.metadata.layers
+  }
+}));
 
 const drupalVedaSettings = {
-  mapbox_token: process.env.MDX_EDITOR_MAPBOX_TOKEN,
-  api_stac_endpoint: process.env.MDX_EDITOR_API_STAC_ENDPOINT,
-  api_raster_endpoint: process.env.MDX_EDITOR_API_RASTER_ENDPOINT,
+  mapbox_token: process.env.MDX_EDITOR_MAPBOX_TOKEN || 'pk.placeholder_token',
+  api_stac_endpoint: process.env.MDX_EDITOR_API_STAC_ENDPOINT || 'https://placeholder-stac.com',
+  api_raster_endpoint: process.env.MDX_EDITOR_API_RASTER_ENDPOINT || 'https://placeholder-raster.com',
 };
 
 const basicComponents = {
@@ -58,7 +75,7 @@ const MDXRemoteInternalRenderer = ({ content, style = 'default', enableComponent
                 const validChildren = React.Children.toArray(scrollyProps.children)
                     .filter(child => React.isValidElement(child) && child.type === Chapter);
                 return (
-                    <ScrollytellingBlock {...scrollyProps} datasets={mockDatasets} children={validChildren} />
+                    <ScrollytellingBlock {...scrollyProps} datasets={transformedDatasets} children={validChildren} />
                 );
             },
             Block: Block,
@@ -66,9 +83,39 @@ const MDXRemoteInternalRenderer = ({ content, style = 'default', enableComponent
             Widget: Widget,
             Caption: Caption,
             Prose: Prose,
+            Map: (props) => {
+                const { children, center, zoom, datasetId, layerId, ...rest } = props;
+                
+                // Parse center if it's a string
+                let parsedCenter = center;
+                if (typeof center === 'string') {
+                    try {
+                        parsedCenter = JSON.parse(center);
+                    } catch (e) {
+                        console.warn('Failed to parse center:', center);
+                        parsedCenter = [0, 0];
+                    }
+                }
+                
+                // Parse zoom if it's a string
+                let parsedZoom = zoom;
+                if (typeof zoom === 'string') {
+                    parsedZoom = parseFloat(zoom);
+                }
+                
+                // Check if dataset exists, fallback to first available
+                const availableDatasets = transformedDatasets || [];
+                const datasetExists = availableDatasets.some(ds => ds.id === datasetId);
+                const finalDatasetId = datasetExists ? datasetId : (availableDatasets[0]?.id || 'default');
+                
+                if (!datasetExists) {
+                    console.warn(`Dataset [${datasetId}] not found, using [${finalDatasetId}]`);
+                }
+                return <ClientMapBlock {...rest} datasets={allAvailableDatasets} children={children}/>;
+            },
             MapBlock: (props) => {
                 const { children, ...rest } = props;
-                return <MapBlock {...rest} datasets={mockDatasets} children={children} />;
+                return <MapBlock {...rest} datasets={transformedDatasets} children={children} />;
             },
         } : {})
     };
@@ -88,6 +135,7 @@ const MDXRemoteInternalRenderer = ({ content, style = 'default', enableComponent
       }
 
       if (typeof contentToEvaluate === 'string') {
+        contentToEvaluate = contentToEvaluate.replace(/^import.*from.*$/gm, '');
         contentToEvaluate = contentToEvaluate.replace(/&#x20;/g, ' ');
         contentToEvaluate = contentToEvaluate.replace(/&nbsp;/g, ' ');
         contentToEvaluate = contentToEvaluate.replace(/\u00A0/g, ' ');
@@ -103,6 +151,8 @@ const MDXRemoteInternalRenderer = ({ content, style = 'default', enableComponent
           ...jsxs_runtime,
           Fragment: Fragment,
           useMDXComponents: () => allComponentsForMdx,
+          useDynamicImport: true,
+          baseUrl: import.meta.url,
         });
         setRenderedMdxModule(() => evaluatedModule.default);
       } catch (err) {
@@ -128,7 +178,7 @@ const MDXRemoteInternalRenderer = ({ content, style = 'default', enableComponent
               envMapboxToken: drupalVedaSettings.mapbox_token,
               envApiStacEndpoint: drupalVedaSettings.api_stac_endpoint,
               envApiRasterEndpoint: drupalVedaSettings.api_raster_endpoint,
-              datasets: mockDatasets,
+              datasets: transformedDatasets,
               navigation: {
                 LinkComponent: 'a',
                 linkProps: { pathAttributeKeyName: 'href' }
