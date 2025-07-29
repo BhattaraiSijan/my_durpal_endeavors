@@ -35,29 +35,46 @@ const createPlaceholderNode = (): LexicalNode & {
 };
 
 // Map editor component that includes both preview and editable properties
+// Map editor component that includes both preview and editable properties
 const MapEditorWithPreview: React.FC<any> = (props) => {
   const contextValue = useMapContext();
   const [isEditing, setIsEditing] = useState(true);
+  
+  // Fixed initialMapProps with proper null checks
   const initialMapProps = () => {
-    const generatedProps = props.props.mdastNode.attributes.reduce(
-      (acc, item) => {
-        acc[item.name] = item.value;
-        return acc;
-      },
-      {},
-    );
+    try {
+      if (!props?.props?.mdastNode?.attributes) {
+        console.warn('Missing mdastNode attributes, using default props');
+        return { ...DEFAULT_MAP_PROPS };
+      }
 
-    if (
-      generatedProps.center &&
-      generatedProps.layerId &&
-      generatedProps.zoom &&
-      generatedProps.datasetId &&
-      generatedProps.dateTime
-    ) {
-      return { ...generatedProps };
+      const generatedProps = props.props.mdastNode.attributes.reduce(
+        (acc, item) => {
+          // Add safety check for item and its properties
+          if (item && item.name && item.value !== undefined) {
+            acc[item.name] = item.value;
+          }
+          return acc;
+        },
+        {},
+      );
+
+      if (
+        generatedProps.center &&
+        generatedProps.layerId &&
+        generatedProps.zoom &&
+        generatedProps.datasetId &&
+        generatedProps.dateTime
+      ) {
+        return { ...generatedProps };
+      }
+      return { ...DEFAULT_MAP_PROPS };
+    } catch (error) {
+      console.error('Error in initialMapProps:', error);
+      return { ...DEFAULT_MAP_PROPS };
     }
-    return { ...DEFAULT_MAP_PROPS };
   };
+
   const [mapProps, setMapProps] = useState(initialMapProps());
   const [draftInputs, setDraftInputs] = useState({
     defaultDateFormat: '%Y-%m-%d',
@@ -70,6 +87,7 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
     compareDateTime: false,
     center: false,
   });
+  console.log('MapProps:', mapProps);
   const {
     center,
     layerId,
@@ -95,6 +113,32 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
 
   const updateMdastNode = useMdastNodeUpdater();
   const { mdastNode, allAvailableDatasets } = props;
+
+  // Create dropdown options from the available datasets
+  const datasetOptions = React.useMemo(() => 
+    allAvailableDatasets?.map(d => ({
+      value: d.metadata.id,
+      label: d.metadata.name
+    })) || [], 
+    [allAvailableDatasets]
+  );
+
+  // Find the currently selected dataset to populate layer options
+  const selectedDataset = React.useMemo(() => 
+    allAvailableDatasets?.find((d) => d.metadata.id === datasetId),
+    [allAvailableDatasets, datasetId]
+  );
+  
+  const layerOptions = React.useMemo(() => 
+    selectedDataset?.metadata.layers.map(l => ({
+      value: l.id,
+      label: l.name
+    })) || [],
+    [selectedDataset]
+  );
+
+  console.log("Dataset Options:", datasetOptions);
+  console.log("Layer Options:", layerOptions);
 
   const stateToNode = [
     {
@@ -148,6 +192,7 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
       value: caption,
     },
   ];
+
   const updateProps = () => {
     try {
       if (contextValue?.parentEditor && contextValue?.lexicalNode) {
@@ -178,15 +223,15 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
   };
 
   // Update lexical node when any property changes
- useEffect(() => {
-  // Defer the updates to avoid flushSync during render
-  setTimeout(() => {
-    updateProps();
-    updateMdastNode({ ...mdastNode, attributes: stateToNode });
-  }, 0);
-}, [mapProps]);
+  useEffect(() => {
+    // Defer the updates to avoid flushSync during render
+    setTimeout(() => {
+      updateProps();
+      updateMdastNode({ ...mdastNode, attributes: stateToNode });
+    }, 0);
+  }, [mapProps]);
 
-// When the selected dataset changes, auto-select the first layer
+  // When the selected dataset changes, auto-select the first layer
   useEffect(() => {
     if (selectedDataset && selectedDataset.metadata.layers.length > 0) {
       // Only update if the current layerId is not valid for the new dataset
@@ -200,7 +245,7 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
         }));
       }
     }
-  }, [datasetId]);
+  }, [datasetId, selectedDataset, layerId]);
 
   const firstInterface = [
     { fieldName: '*Dataset ID', propName: 'datasetId', isRequired: true },
@@ -219,6 +264,7 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
       validateAgainst: 'defaultDateFormat',
     },
   ];
+
   const comparisonInterface = [
     { fieldName: 'Compare Label', propName: 'compareLabel' },
     {
@@ -239,22 +285,6 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
     },
   ];
 
-  // Create dropdown options from the available datasets
-  const datasetOptions = allAvailableDatasets?.map(d => ({
-    value: d.metadata.id,
-    label: d.metadata.name
-  }));
-
-  // Find the currently selected dataset to populate layer options
-  const selectedDataset = allAvailableDatasets?.find(
-    (d) => d.metadata.id === datasetId
-  );
-  
-  const layerOptions = selectedDataset?.metadata.layers.map(l => ({
-    value: l.id,
-    label: l.name
-  }));
-
   return (
     <>
       <div className=' border-05 border-primary rounded-lg overflow-hidden shadow-sm bg-white'>
@@ -268,7 +298,7 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
                   Map Properties
                 </h3>
                 <div className='grid-row flex-align-end grid-gap-2'>
-                  {firstInterface.map((field) => {
+                  {firstInterface.map((field, index) => {
                     const { propName } = field;
 
                     const fieldProps = {
@@ -283,51 +313,41 @@ const MapEditorWithPreview: React.FC<any> = (props) => {
                     };
 
                     if (propName === 'datasetId') {
-                      fieldProps.options = datasetOptions; // Use dataset options
+                      fieldProps.options = datasetOptions;
                     } else if (propName === 'layerId') {
-                      fieldProps.options = layerOptions; // Use layer options
+                      fieldProps.options = layerOptions;
                     }
 
-                    return InputField(fieldProps);
+                    return <InputField key={propName} {...fieldProps} />;
                   })}
                 </div>
                 <h4>Map Comparison</h4>
                 <div className='grid-row flex-align-end grid-gap-2'>
-                  {comparisonInterface.map((field) => {
-                    const { propName, fieldName, type, customClass } = field;
-
-                    return InputField({
+                  {comparisonInterface.map((field, index) => {
+                    const fieldProps = {
                       ...field,
-                      fieldName,
-                      value: mapProps[propName],
+                      value: mapProps[field.propName],
                       onChange: setMapProps,
-                      type: type,
                       componentProps: mapProps,
-                      propName,
-                      customClass: customClass,
                       draftInputs,
                       setDraftInputs,
                       inputErrors,
-                      allAvailableDatasets,
                       setInputErrors,
-                    });
+                    };
+
+                    return <InputField key={field.propName} {...fieldProps} />;
                   })}
                 </div>
                 <div className='grid-row flex-align-start grid-gap-2'>
-                  {captionInterface.map((field) => {
-                    const { propName, fieldName, type, customClass } = field;
-
-                    return InputField({
+                  {captionInterface.map((field, index) => {
+                    const fieldProps = {
                       ...field,
-                      fieldName,
-                      value: mapProps[propName],
+                      value: mapProps[field.propName],
                       onChange: setMapProps,
-                      type: type,
                       componentProps: mapProps,
-                      propName: propName,
-                      customClass: customClass,
-                      allAvailableDatasets,
-                    });
+                    };
+
+                    return <InputField key={field.propName} {...fieldProps} />;
                   })}
                 </div>
               </div>

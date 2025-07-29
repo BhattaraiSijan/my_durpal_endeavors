@@ -242,7 +242,7 @@ const allAvailableDatasets: DatasetWithContent[] = [
   },
   {
   metadata: {
-    id: "vulcan-ffco2-elc-res-yeargrid-v4",
+    id: "vulcan-total-co2",
     name: "Vulcan Fossil Fuel CO₂ Emissions, Version 4",
     description: "Annual (2010 - 2021), 1 km resolution estimates of carbon dioxide emissions from fossil fuels and cement production over the contiguous United States, version 4.0",
     isHidden: true,

@@ -20,29 +20,52 @@ const MapBlock = dynamic(() => import('./lib').then((mod) => mod.MapBlock), {
 
 interface MapPreviewProps {
   allAvailableDatasets?: DatasetWithContent[];
+  datasets?: DatasetWithContent[];
+  datasetId?: string;
+  layerId?: string;
   [key: string]: any;
 }
 
 export function ClientMapBlock(props: MapPreviewProps) {
-const datasetsToUse = props.datasets || [];
-if (datasetsToUse.length === 0) {
-    return (
-      <div className='relative w-full h-[250px] flex items-center justify-center bg-gray-100'>
-        <p className='text-gray-600'>No datasets available</p>
-      </div>
-    );
-  }
+  // Use allAvailableDatasets if datasets is not provided
+  const datasetsToUse = props.datasets || props.allAvailableDatasets || [];
+  const transformed = transformToVedaData(datasetsToUse as any);
+  // // Find the specific dataset that matches the datasetId prop
+  // const relevantDataset = React.useMemo(() => {
+  //   if (!props.datasetId || datasetsToUse.length === 0) {
+  //     return null;
+  //   }
+    
+  //   return datasetsToUse.find(dataset => 
+  //     dataset.metadata?.id === props.datasetId
+  //   );
+  // }, [datasetsToUse, props.datasetId]);
 
-const transformed = transformToVedaData(datasetsToUse as any);
+  // Transform only the relevant dataset
+  // const transformed = React.useMemo(() => {
+  //   if (!relevantDataset) {
+  //     console.warn(`Dataset with ID ${props.datasetId} not found in available datasets`);
+  //     return {};
+  //   }
+  //   try {
+  //     const result = transformToVedaData([relevantDataset] as any);
+  //     console.log('Transform result:', result);
+  //     return result;
+  //   } catch (error) {
+  //     console.error('Error transforming data:', error);
+  //     return {};
+  //   }
+  // }, [relevantDataset, props.datasetId]);
 
-console.log('Transformed datasets:', transformed);
-console.log('Props for MapBlock:', props);
   return (
     <DevseedUIThemeProvider>
       <VedaUIConfigProvider>
-        <DataProvider initialDatasets={datasetsToUse}>
+        <DataProvider initialDatasets={[datasetsToUse]}>
           <div className='relative w-full h-[250px]'>
-            <MapBlock {...props} datasets={transformed}/>
+            <MapBlock 
+              {...props} 
+              datasets={transformed}
+            />
           </div>
         </DataProvider>
       </VedaUIConfigProvider>

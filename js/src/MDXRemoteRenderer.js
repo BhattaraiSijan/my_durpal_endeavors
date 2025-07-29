@@ -84,35 +84,46 @@ const MDXRemoteInternalRenderer = ({ content, style = 'default', enableComponent
             Caption: Caption,
             Prose: Prose,
             Map: (props) => {
-                const { children, center, zoom, datasetId, layerId, ...rest } = props;
-                
-                // Parse center if it's a string
-                let parsedCenter = center;
-                if (typeof center === 'string') {
-                    try {
-                        parsedCenter = JSON.parse(center);
-                    } catch (e) {
-                        console.warn('Failed to parse center:', center);
-                        parsedCenter = [0, 0];
-                    }
-                }
-                
-                // Parse zoom if it's a string
-                let parsedZoom = zoom;
-                if (typeof zoom === 'string') {
-                    parsedZoom = parseFloat(zoom);
-                }
-                
-                // Check if dataset exists, fallback to first available
-                const availableDatasets = transformedDatasets || [];
-                const datasetExists = availableDatasets.some(ds => ds.id === datasetId);
-                const finalDatasetId = datasetExists ? datasetId : (availableDatasets[0]?.id || 'default');
-                
-                if (!datasetExists) {
-                    console.warn(`Dataset [${datasetId}] not found, using [${finalDatasetId}]`);
-                }
-                return <ClientMapBlock {...rest} datasets={allAvailableDatasets} children={children}/>;
-            },
+    const { children, center, zoom, datasetId, layerId, ...rest } = props;
+    
+    // Parse center if it's a string
+    let parsedCenter = center;
+    if (typeof center === 'string') {
+        try {
+            parsedCenter = JSON.parse(center);
+        } catch (e) {
+            console.warn('Failed to parse center:', center);
+            parsedCenter = [0, 0];
+        }
+    }
+    
+    // Parse zoom if it's a string
+    let parsedZoom = zoom;
+    if (typeof zoom === 'string') {
+        parsedZoom = parseFloat(zoom);
+    }
+    
+    // Check if dataset exists, fallback to first available
+    const availableDatasets = transformedDatasets || [];
+    const datasetExists = availableDatasets.some(ds => ds.id === datasetId);
+    const finalDatasetId = datasetExists ? datasetId : (availableDatasets[0]?.id || 'default');
+    
+    if (!datasetExists && datasetId) {
+        console.warn(`Dataset [${datasetId}] not found, using [${finalDatasetId}]`);
+    }
+    
+    return (
+        <ClientMapBlock 
+            {...rest} 
+            center={parsedCenter}
+            zoom={parsedZoom}
+            datasetId={finalDatasetId}
+            layerId={layerId}
+            allAvailableDatasets={allAvailableDatasets} 
+            children={children}
+        />
+    );
+},
             MapBlock: (props) => {
                 const { children, ...rest } = props;
                 return <MapBlock {...rest} datasets={transformedDatasets} children={children} />;

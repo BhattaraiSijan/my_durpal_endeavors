@@ -183,7 +183,7 @@ export default function EditorPage({ allAvailableDatasets }) {
                   </div>
                 }
               >
-                {/* <LexicalComposer initialConfig={initialConfig}> */}
+                <LexicalComposer initialConfig={initialConfig}>
                   <ErrorBoundary>
                   <MDXEditorEnhanced
                     key={EDITOR_KEY}
@@ -193,7 +193,7 @@ export default function EditorPage({ allAvailableDatasets }) {
                     previewMDAST={setReserializedMdxContent}
                   />
                   </ErrorBoundary>
-                {/* </LexicalComposer> */}
+                </LexicalComposer>
               </Suspense>
           </div>
         </div>
