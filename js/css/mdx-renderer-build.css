@@ -1,3 +1,6 @@
+/*!*************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/@mdxeditor/editor/dist/style.css ***!
+  \*************************************************************************************************/
 :root, .light, .light-theme {
   --blue-1: #fbfdff;
   --blue-2: #f4faff;
@@ -2274,6 +2277,9 @@ form._multiFieldForm_sects_1209 ._formField_sects_1215 label {
     outline: none;
   }
 
+/*!******************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./js/src/renderer-styles.css ***!
+  \******************************************************************************/
 /* Styles for the MDX renderer */
 .mdx-renderer-wrapper {
     font-family: var(--font-sans, system-ui, -apple-system, sans-serif);

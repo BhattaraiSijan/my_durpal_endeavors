@@ -63,17 +63,15 @@ import {
   InsertLineGraph,
   InsertTwoColumnButton,
   InsertSectionBreak,
-  InsertEmitInterfaceButton,
-  InsertInterfaceDropdown
 } from './ToolbarComponents';
 
 import {
   jsxComponentDescriptors,
   CalloutDirectiveDescriptor,
 } from './ComponentDescriptors';
-import { nodeGroupingPlugin } from '../plugins/mdxGrouping';
+import { nodeGroupingPlugin } from './plugins/mdxGrouping';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createBlockNode, $createProseNode } from '../plugins/utils';
+import { $createBlockNode, $createProseNode } from './plugins/utils';
 import { unified } from 'unified';
 import remarkParse from 'remark-parse';
 import remarkStringify from 'remark-stringify';
@@ -92,7 +90,6 @@ const initialConfig = {
   onError: (error) => {
     console.error('Lexical editor error:', error);
   },
-  // ... other Lexical configuration options if needed
 };
 
 export function MDXEditorEnhanced({
@@ -202,7 +199,6 @@ export function MDXEditorEnhanced({
                   <InsertMapButton />
                   <InsertLineGraph />
                   <InsertTwoColumnButton />
-                  <InsertInterfaceDropdown />
                   <InsertSectionBreak />
                 </div>
               </div>

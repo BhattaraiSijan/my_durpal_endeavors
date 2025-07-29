@@ -18,7 +18,7 @@ module.exports = {
       filename: '../css/[name].css',
     }),
     new Dotenv({
-        path: './.env.local', 
+        path: './.env', 
         safe: true,          
         systemvars: true,     
         silent: true,         

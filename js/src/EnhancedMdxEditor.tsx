@@ -13,6 +13,29 @@ import Providers from './datasets/providers.tsx';
 import { LegacyGlobalStyles } from './lib';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    console.error('Error in MDX Editor:', error);
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('MDX Editor Error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <div>Something went wrong with the MDX Editor.</div>;
+    }
+    return this.props.children;
+  }
+}
 // Use a stable key to preserve the editor state
 const EDITOR_KEY = 'stable-mdx-editor-instance';
 
@@ -160,7 +183,8 @@ export default function EditorPage({ allAvailableDatasets }) {
                   </div>
                 }
               >
-                <LexicalComposer initialConfig={initialConfig}>
+                {/* <LexicalComposer initialConfig={initialConfig}> */}
+                  <ErrorBoundary>
                   <MDXEditorEnhanced
                     key={EDITOR_KEY}
                     markdown={mdxContent}
@@ -168,7 +192,8 @@ export default function EditorPage({ allAvailableDatasets }) {
                     editorMounted={editorMounted}
                     previewMDAST={setReserializedMdxContent}
                   />
-                </LexicalComposer>
+                  </ErrorBoundary>
+                {/* </LexicalComposer> */}
               </Suspense>
           </div>
         </div>
